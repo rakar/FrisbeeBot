@@ -40,25 +40,25 @@ public class FrisbeeCB extends Cyborg {
         // #region Device List...
         public static CBDeviceID
         // modules
-        pdb,
+        pdbID,
 
                         // driver controls
-                        driveRotAxis, driveFwdAxis, launchButton,
+                        driveRotAxisID, driveFwdAxisID, launchButtonID,
 
                         // drivetrain Motors
-                        lsMC1, lsMC2, rsMC3, rsMC4,
+                        lsMC1ID, lsMC2ID, rsMC3ID, rsMC4ID,
 
                         // dt Encoders
-                        lsEnc, rsEnc,
+                        lsEncID, rsEncID,
 
                         // launch Motors
-                        frsMC5,
+                        frsMC5ID,
 
                         // pneumatic splenoids
-                        launcherReadySol0, launcherLaunchSol1,
+                        launcherReadySol0ID, launcherLaunchSol1ID,
 
                         // servos
-                        loadServ0
+                        loadServ0ID
 
         ;
         // #endregion
@@ -80,40 +80,40 @@ public class FrisbeeCB extends Cyborg {
         }
 
         private void defineDevices() {
-                pdb = hardwareAdapter.add(new CBPDB());
+                pdbID = hardwareAdapter.add(new CBPDB());
 
-                driveRotAxis = hardwareAdapter.add(new CBAxis(driveStickID, 0).setDeadzone(0.1));
-                driveFwdAxis = hardwareAdapter.add(new CBAxis(driveStickID, 0).setDeadzone(0.1));
-                launchButton = hardwareAdapter.add(new CBButton(driveStickID, 0));
+                driveRotAxisID = hardwareAdapter.add(new CBAxis(driveStickID, 0).setDeadzone(0.1));
+                driveFwdAxisID = hardwareAdapter.add(new CBAxis(driveStickID, 0).setDeadzone(0.1));
+                launchButtonID = hardwareAdapter.add(new CBButton(driveStickID, 0));
 
                 // drivetrain Motors
-                lsMC1 = hardwareAdapter
+                lsMC1ID = hardwareAdapter
                                 .add(new CBTalonSRX(1).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
-                lsMC2 = hardwareAdapter
+                lsMC2ID = hardwareAdapter
                                 .add(new CBTalonSRX(2).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
-                rsMC3 = hardwareAdapter
+                rsMC3ID = hardwareAdapter
                                 .add(new CBTalonSRX(3).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
-                rsMC4 = hardwareAdapter
+                rsMC4ID = hardwareAdapter
                                 .add(new CBTalonSRX(4).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
 
                 // dt Encoders
                 // lsEnc, rsEnc,
 
                 // launch Motors
-                frsMC5 = hardwareAdapter.add(new CBTalonSRX(5));
+                frsMC5ID = hardwareAdapter.add(new CBTalonSRX(5));
 
                 // pneumatic splenoids
-                launcherReadySol0 = hardwareAdapter.add(new CBSolenoid(0));
-                launcherLaunchSol1 = hardwareAdapter.add(new CBSolenoid(1));
+                launcherReadySol0ID = hardwareAdapter.add(new CBSolenoid(0));
+                launcherLaunchSol1ID = hardwareAdapter.add(new CBSolenoid(1));
 
                 // servos
-                loadServ0 = hardwareAdapter.add(new CBServo(0));
+                loadServ0ID = hardwareAdapter.add(new CBServo(0));
 
         }
 
         private void defineMappers() {
-                this.addTeleOpMapper(new CBArcadeDriveMapper(this, requestData.drivetrain).setAxes(driveFwdAxis, null,
-                                driveRotAxis));
+                this.addTeleOpMapper(new CBArcadeDriveMapper(this, requestData.drivetrain).setAxes(driveFwdAxisID, null,
+                                driveRotAxisID));
                 this.addTeleOpMapper(new TeleOpMapper(this));
         }
 
@@ -121,10 +121,10 @@ public class FrisbeeCB extends Cyborg {
                 this.addRobotController(new CBDifferentialDriveController(this, controlData.drivetrain)
                                 .addLeftDriveModule(new CBDriveModule(new CB2DVector(-1, 0), 0)
                                                 .addSpeedControllerArray(new CBSmartSpeedControllerArray()
-                                                                .addSpeedController(lsMC1).addSpeedController(lsMC2)))
+                                                                .addSpeedController(lsMC1ID).addSpeedController(lsMC2ID)))
                                 .addRightDriveModule(new CBDriveModule(new CB2DVector(1, 0), 180)
                                                 .addSpeedControllerArray(new CBSmartSpeedControllerArray()
-                                                                .addSpeedController(rsMC3).addSpeedController(rsMC4)))
+                                                                .addSpeedController(rsMC3ID).addSpeedController(rsMC4ID)))
 
                 );
                 this.addRobotController(new LauncherController(this));

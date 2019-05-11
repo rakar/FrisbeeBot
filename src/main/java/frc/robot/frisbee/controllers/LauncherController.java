@@ -15,7 +15,6 @@ import org.montclairrobotics.cyborg.devices.CBSolenoid;
 import org.montclairrobotics.cyborg.devices.CBTalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.frisbee.FrisbeeCB;
 import static frc.robot.frisbee.FrisbeeCB.*;
 
 /**
@@ -97,10 +96,10 @@ public class LauncherController extends CBRobotController {
     }
 
     public void init() {
-        servo = FrisbeeCB.hardwareAdapter.getServo(FrisbeeCB.loadServ0);
-        ready = FrisbeeCB.hardwareAdapter.getSolenoidValve(FrisbeeCB.launcherReadySol0);
-        launch = FrisbeeCB.hardwareAdapter.getSolenoidValve(FrisbeeCB.launcherLaunchSol1);
-        spinner = FrisbeeCB.hardwareAdapter.getTalonSRX(FrisbeeCB.frsMC5);
+        servo = hardwareAdapter.getServo(loadServ0ID);
+        ready = hardwareAdapter.getSolenoidValve(launcherReadySol0ID);
+        launch = hardwareAdapter.getSolenoidValve(launcherLaunchSol1ID);
+        spinner = hardwareAdapter.getTalonSRX(frsMC5ID);
         sm = new LauncherStateMachine();
     }
 

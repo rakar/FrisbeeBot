@@ -11,7 +11,7 @@ import org.montclairrobotics.cyborg.Cyborg;
 import org.montclairrobotics.cyborg.core.mappers.CBTeleOpMapper;
 import org.montclairrobotics.cyborg.devices.CBButton;
 
-import frc.robot.frisbee.FrisbeeCB;
+import static frc.robot.frisbee.FrisbeeCB.*;
 
 /**
  * Add your docs here.
@@ -26,11 +26,11 @@ public class TeleOpMapper extends CBTeleOpMapper {
 
     @Override
     public void init() {
-        launchButton = FrisbeeCB.hardwareAdapter.getButton(FrisbeeCB.launchButton);
+        launchButton = hardwareAdapter.getButton(launchButtonID);
     }
 
     @Override
     public void update() {
-        FrisbeeCB.requestData.launchFrisbee = launchButton.getState(); 
+        requestData.launchFrisbee = launchButton.getState(); 
     }
 }
