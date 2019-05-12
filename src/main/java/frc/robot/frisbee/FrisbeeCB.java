@@ -12,6 +12,7 @@ import org.montclairrobotics.cyborg.core.assemblies.CBDriveModule;
 import org.montclairrobotics.cyborg.core.assemblies.CBSmartSpeedControllerArray;
 import org.montclairrobotics.cyborg.core.behaviors.CBStdDriveBehavior;
 import org.montclairrobotics.cyborg.core.controllers.CBDifferentialDriveController;
+import org.montclairrobotics.cyborg.core.data.CBLogicData;
 import org.montclairrobotics.cyborg.core.mappers.CBArcadeDriveMapper;
 import org.montclairrobotics.cyborg.core.utils.CB2DVector;
 import org.montclairrobotics.cyborg.core.utils.CBEnums;
@@ -65,6 +66,7 @@ public class FrisbeeCB extends Cyborg {
 
         public static RequestData requestData;
         public static ControlData controlData;
+        public static CBLogicData logicData;
 
         @Override
         public void cyborgInit() {
@@ -72,11 +74,13 @@ public class FrisbeeCB extends Cyborg {
                 // data init
                 requestData = new RequestData();
                 controlData = new ControlData();
+                logicData = new CBLogicData();
 
                 defineDevices();
-                defineMappers();
-                defineControllers();
-                defineBehaviors();
+
+                addMappers();
+                addControllers();
+                addBehaviors();
         }
 
         private void defineDevices() {
@@ -111,13 +115,13 @@ public class FrisbeeCB extends Cyborg {
 
         }
 
-        private void defineMappers() {
+        private void addMappers() {
                 this.addTeleOpMapper(new CBArcadeDriveMapper(this, requestData.drivetrain).setAxes(driveFwdAxisID, null,
                                 driveRotAxisID));
                 this.addTeleOpMapper(new TeleOpMapper(this));
         }
 
-        private void defineControllers() {
+        private void addControllers() {
                 this.addRobotController(new CBDifferentialDriveController(this, controlData.drivetrain)
                                 .addLeftDriveModule(new CBDriveModule(new CB2DVector(-1, 0), 0)
                                                 .addSpeedControllerArray(new CBSmartSpeedControllerArray()
@@ -130,7 +134,7 @@ public class FrisbeeCB extends Cyborg {
                 this.addRobotController(new LauncherController(this));
         }
 
-        private void defineBehaviors() {
+        private void addBehaviors() {
                 this.addBehavior(new CBStdDriveBehavior(this, requestData.drivetrain, controlData.drivetrain));
                 this.addBehavior(new FrisbeeBehavior(this));
         }
