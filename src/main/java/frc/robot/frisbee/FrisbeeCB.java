@@ -12,31 +12,29 @@ import org.montclairrobotics.cyborg.core.assemblies.CBDriveModule;
 import org.montclairrobotics.cyborg.core.assemblies.CBSmartSpeedControllerArray;
 import org.montclairrobotics.cyborg.core.behaviors.CBStdDriveBehavior;
 import org.montclairrobotics.cyborg.core.controllers.CBDifferentialDriveController;
-import org.montclairrobotics.cyborg.core.data.CBLogicData;
 import org.montclairrobotics.cyborg.core.mappers.CBArcadeDriveMapper;
 import org.montclairrobotics.cyborg.core.utils.CB2DVector;
-import org.montclairrobotics.cyborg.core.utils.CBEnums;
 import org.montclairrobotics.cyborg.devices.CBAxis;
 import org.montclairrobotics.cyborg.devices.CBButton;
 import org.montclairrobotics.cyborg.devices.CBDeviceID;
+import org.montclairrobotics.cyborg.devices.CBHardwareAdapter;
 import org.montclairrobotics.cyborg.devices.CBPDB;
 import org.montclairrobotics.cyborg.devices.CBServo;
 import org.montclairrobotics.cyborg.devices.CBSolenoid;
 import org.montclairrobotics.cyborg.devices.CBTalonSRX;
 
 import frc.robot.frisbee.behaviors.FrisbeeBehavior;
-import frc.robot.frisbee.controllers.LauncherController;
 import frc.robot.frisbee.data.ControlData;
+import frc.robot.frisbee.data.LogicData;
 import frc.robot.frisbee.data.RequestData;
 import frc.robot.frisbee.mappers.TeleOpMapper;
 
-/**
- * Add your docs here.
- */
 public class FrisbeeCB extends Cyborg {
 
         // joystick ports
         private final int driveStickID = 0;
+        //private final int operStickID = 1;
+        //private final int buttonBoxID = 2;
 
         // #region Device List...
         public static CBDeviceID
@@ -66,7 +64,7 @@ public class FrisbeeCB extends Cyborg {
 
         public static RequestData requestData;
         public static ControlData controlData;
-        public static CBLogicData logicData;
+        public static LogicData logicData;
 
         @Override
         public void cyborgInit() {
@@ -74,7 +72,7 @@ public class FrisbeeCB extends Cyborg {
                 // data init
                 requestData = new RequestData();
                 controlData = new ControlData();
-                logicData = new CBLogicData();
+                logicData = new LogicData();
 
                 defineDevices();
 
@@ -84,21 +82,18 @@ public class FrisbeeCB extends Cyborg {
         }
 
         private void defineDevices() {
+                hardwareAdapter = new CBHardwareAdapter(this);
                 pdbID = hardwareAdapter.add(new CBPDB());
 
                 driveRotAxisID = hardwareAdapter.add(new CBAxis(driveStickID, 0).setDeadzone(0.1));
-                driveFwdAxisID = hardwareAdapter.add(new CBAxis(driveStickID, 0).setDeadzone(0.1));
-                launchButtonID = hardwareAdapter.add(new CBButton(driveStickID, 0));
+                driveFwdAxisID = hardwareAdapter.add(new CBAxis(driveStickID, 1).setDeadzone(0.1));
+                launchButtonID = hardwareAdapter.add(new CBButton(driveStickID, 1));
 
                 // drivetrain Motors
-                lsMC1ID = hardwareAdapter
-                                .add(new CBTalonSRX(1).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
-                lsMC2ID = hardwareAdapter
-                                .add(new CBTalonSRX(2).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
-                rsMC3ID = hardwareAdapter
-                                .add(new CBTalonSRX(3).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
-                rsMC4ID = hardwareAdapter
-                                .add(new CBTalonSRX(4).setControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT));
+                lsMC1ID = hardwareAdapter.add(new CBTalonSRX(1));
+                lsMC2ID = hardwareAdapter.add(new CBTalonSRX(2));
+                rsMC3ID = hardwareAdapter.add(new CBTalonSRX(3));
+                rsMC4ID = hardwareAdapter.add(new CBTalonSRX(4));
 
                 // dt Encoders
                 // lsEnc, rsEnc,
@@ -116,8 +111,9 @@ public class FrisbeeCB extends Cyborg {
         }
 
         private void addMappers() {
-                this.addTeleOpMapper(new CBArcadeDriveMapper(this, requestData.drivetrain).setAxes(driveFwdAxisID, null,
-                                driveRotAxisID));
+                this.addTeleOpMapper(new CBArcadeDriveMapper(this, requestData.drivetrain)
+                        .setAxes(driveFwdAxisID, null, driveRotAxisID)
+                );
                 this.addTeleOpMapper(new TeleOpMapper(this));
         }
 
@@ -125,13 +121,17 @@ public class FrisbeeCB extends Cyborg {
                 this.addRobotController(new CBDifferentialDriveController(this, controlData.drivetrain)
                                 .addLeftDriveModule(new CBDriveModule(new CB2DVector(-1, 0), 0)
                                                 .addSpeedControllerArray(new CBSmartSpeedControllerArray()
-                                                                .addSpeedController(lsMC1ID).addSpeedController(lsMC2ID)))
+                                                                .addSpeedController(lsMC1ID)
+                                                                .addSpeedController(lsMC2ID)
+                                                                ))
                                 .addRightDriveModule(new CBDriveModule(new CB2DVector(1, 0), 180)
                                                 .addSpeedControllerArray(new CBSmartSpeedControllerArray()
-                                                                .addSpeedController(rsMC3ID).addSpeedController(rsMC4ID)))
+                                                                .addSpeedController(rsMC3ID)
+                                                                .addSpeedController(rsMC4ID)
+                                                                ))
 
                 );
-                this.addRobotController(new LauncherController(this));
+                //this.addRobotController(new LauncherController(this));
         }
 
         private void addBehaviors() {

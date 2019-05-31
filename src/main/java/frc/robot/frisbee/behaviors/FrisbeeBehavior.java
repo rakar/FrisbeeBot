@@ -13,7 +13,8 @@ import org.montclairrobotics.cyborg.core.behaviors.CBBehavior;
 import static frc.robot.frisbee.FrisbeeCB.*;
 
 /**
- * Add your docs here.
+ * Frisbee launcher Behavior
+ * Simply copy a launch request to lauch control 
  */
 public class FrisbeeBehavior extends CBBehavior {
     
@@ -21,10 +22,8 @@ public class FrisbeeBehavior extends CBBehavior {
         super(robot);
     }
 
-    public void init() {
-    }
-    
     public void update() {
+        super.update();
         controlData.launch = requestData.launchFrisbee;
     }
 
