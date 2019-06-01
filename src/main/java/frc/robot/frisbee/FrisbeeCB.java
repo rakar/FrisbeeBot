@@ -14,6 +14,7 @@ import org.montclairrobotics.cyborg.core.behaviors.CBStdDriveBehavior;
 import org.montclairrobotics.cyborg.core.controllers.CBDifferentialDriveController;
 import org.montclairrobotics.cyborg.core.mappers.CBArcadeDriveMapper;
 import org.montclairrobotics.cyborg.core.utils.CB2DVector;
+import org.montclairrobotics.cyborg.core.utils.CBEnums;
 import org.montclairrobotics.cyborg.devices.CBAxis;
 import org.montclairrobotics.cyborg.devices.CBButton;
 import org.montclairrobotics.cyborg.devices.CBDeviceID;
@@ -24,6 +25,7 @@ import org.montclairrobotics.cyborg.devices.CBSolenoid;
 import org.montclairrobotics.cyborg.devices.CBTalonSRX;
 
 import frc.robot.frisbee.behaviors.FrisbeeBehavior;
+import frc.robot.frisbee.controllers.LauncherController;
 import frc.robot.frisbee.data.ControlData;
 import frc.robot.frisbee.data.LogicData;
 import frc.robot.frisbee.data.RequestData;
@@ -33,8 +35,8 @@ public class FrisbeeCB extends Cyborg {
 
         // joystick ports
         private final int driveStickID = 0;
-        //private final int operStickID = 1;
-        //private final int buttonBoxID = 2;
+        // private final int operStickID = 1;
+        // private final int buttonBoxID = 2;
 
         // #region Device List...
         public static CBDeviceID
@@ -74,69 +76,66 @@ public class FrisbeeCB extends Cyborg {
                 controlData = new ControlData();
                 logicData = new LogicData();
 
-                defineDevices();
-
-                addMappers();
-                addControllers();
-                addBehaviors();
-        }
-
-        private void defineDevices() {
+                //
+                // Instantiate Devices
+                //
                 hardwareAdapter = new CBHardwareAdapter(this);
-                pdbID = hardwareAdapter.add(new CBPDB());
 
+                // Driver Controls
                 driveRotAxisID = hardwareAdapter.add(new CBAxis(driveStickID, 0).setDeadzone(0.1));
                 driveFwdAxisID = hardwareAdapter.add(new CBAxis(driveStickID, 1).setDeadzone(0.1));
                 launchButtonID = hardwareAdapter.add(new CBButton(driveStickID, 1));
 
-                // drivetrain Motors
+                // Drivetrain Motor Controllers
                 lsMC1ID = hardwareAdapter.add(new CBTalonSRX(1));
                 lsMC2ID = hardwareAdapter.add(new CBTalonSRX(2));
                 rsMC3ID = hardwareAdapter.add(new CBTalonSRX(3));
                 rsMC4ID = hardwareAdapter.add(new CBTalonSRX(4));
 
-                // dt Encoders
-                // lsEnc, rsEnc,
-
-                // launch Motors
+                // Launcher Motor Controllers
                 frsMC5ID = hardwareAdapter.add(new CBTalonSRX(5));
 
-                // pneumatic splenoids
+                // Launcher Pneumatic Solenoids
                 launcherReadySol0ID = hardwareAdapter.add(new CBSolenoid(0));
                 launcherLaunchSol1ID = hardwareAdapter.add(new CBSolenoid(1));
 
-                // servos
+                // Launcher Servo
                 loadServ0ID = hardwareAdapter.add(new CBServo(0));
 
-        }
+                //
+                // Add Mappers to capture joystick & sensor data in RequestData
+                //
+                this.addTeleOpMappers(
+                        new CBArcadeDriveMapper(this, requestData.drivetrain)
+                                .setAxes(driveFwdAxisID, null, driveRotAxisID), 
+                        new TeleOpMapper(this));
 
-        private void addMappers() {
-                this.addTeleOpMapper(new CBArcadeDriveMapper(this, requestData.drivetrain)
-                        .setAxes(driveFwdAxisID, null, driveRotAxisID)
-                );
-                this.addTeleOpMapper(new TeleOpMapper(this));
-        }
-
-        private void addControllers() {
-                this.addRobotController(new CBDifferentialDriveController(this, controlData.drivetrain)
+                //
+                // Add Controllers to actuate hardware based on ControlData
+                //
+                this.addRobotControllers(
+                        new CBDifferentialDriveController(this, controlData.drivetrain)
                                 .addLeftDriveModule(new CBDriveModule(new CB2DVector(-1, 0), 0)
                                                 .addSpeedControllerArray(new CBSmartSpeedControllerArray()
-                                                                .addSpeedController(lsMC1ID)
-                                                                .addSpeedController(lsMC2ID)
-                                                                ))
+                                                        .addSpeedController(lsMC1ID)
+                                                        .addSpeedController(lsMC2ID)
+                                                        .setMotorControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT)
+                                                        ))
                                 .addRightDriveModule(new CBDriveModule(new CB2DVector(1, 0), 180)
                                                 .addSpeedControllerArray(new CBSmartSpeedControllerArray()
-                                                                .addSpeedController(rsMC3ID)
-                                                                .addSpeedController(rsMC4ID)
-                                                                ))
+                                                        .addSpeedController(rsMC3ID)
+                                                        .addSpeedController(rsMC4ID)
+                                                        .setMotorControlMode(CBEnums.CBMotorControlMode.PERCENTAGEOUTPUT)
+                                                        )),
+                                new LauncherController(this));
 
-                );
-                //this.addRobotController(new LauncherController(this));
-        }
+                //
+                // Add Behaviors to process RequestData and output ControlData
+                //
+                this.addBehaviors(
+                        new CBStdDriveBehavior(this, requestData.drivetrain, controlData.drivetrain),
+                        new FrisbeeBehavior(this));
 
-        private void addBehaviors() {
-                this.addBehavior(new CBStdDriveBehavior(this, requestData.drivetrain, controlData.drivetrain));
-                this.addBehavior(new FrisbeeBehavior(this));
         }
 
         @Override
